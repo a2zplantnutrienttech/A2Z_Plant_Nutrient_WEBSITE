@@ -467,14 +467,15 @@ import bcrypt
 
 @api_router.post("/admin-auth")
 async def admin_login(payload: AdminLoginPayload, response: Response):
-    stored_hash_str = os.environ.get("ADMIN_PASSWORD_HASH", "")
-    stored_hash_str = stored_hash_str.strip("'\"")
-    
-    if not stored_hash_str:
-        raise HTTPException(status_code=500, detail="admin-not-configured")
-        
     if not payload.password:
         raise HTTPException(status_code=401, detail="invalid-credentials")
+        
+    res = db.table("admins").select("password_hash").limit(1).execute()
+    
+    if not res.data:
+        raise HTTPException(status_code=500, detail="admin-not-configured")
+        
+    stored_hash_str = res.data[0]["password_hash"]
         
     try:
         if not bcrypt.checkpw(payload.password.encode('utf-8'), stored_hash_str.encode('utf-8')):
