@@ -1,7 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Query, Response, Request
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 import re
@@ -11,6 +10,7 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
+from database import supabase as db
 
 ROOT_DIR = Path(__file__).parent
 import resend
@@ -19,17 +19,6 @@ import asyncio
 resend.api_key = os.environ.get("RESEND_API_KEY", "")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
 
-
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-# Parse DB name from URL or fallback
-try:
-    db_name = mongo_url.split('/')[-1].split('?')[0]
-    if not db_name:
-        db_name = "a2z"
-except Exception:
-    db_name = "a2z"
-db = client[db_name]
 
 app = FastAPI(title="A2Z Plant Nutrient API")
 api_router = APIRouter(prefix="/api")
@@ -713,38 +702,3 @@ async def startup_seed():
     except Exception as e:
         logger.error(f"Auto-seed failed: {e}")
 
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
-
-
-app.include_router(api_router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-
-@app.on_event("startup")
-async def startup_seed():
-    """Auto-seed initial content on startup if collections are empty."""
-    try:
-        if await db.blogs.count_documents({}) == 0:
-            from fastapi import Request  # noqa
-            await seed()
-            logger.info("Auto-seed completed.")
-    except Exception as e:
-        logger.error(f"Auto-seed failed: {e}")
-
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
