@@ -22,7 +22,7 @@ function AdminLoginForm() {
     setSubmitting(true);
     setError("");
     // Call the local Next.js API route so the cookie is set on the frontend domain
-    const res = await fetch(`/api/auth`, {
+    const res = await fetch(`/auth-proxy`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password }),
