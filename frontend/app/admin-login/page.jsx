@@ -21,11 +21,9 @@ function AdminLoginForm() {
     e.preventDefault();
     setSubmitting(true);
     setError("");
-    // Backend (FastAPI) handles password check and cookie set — ingress routes /api/* to it.
-    const backend = process.env.NEXT_PUBLIC_BACKEND_URL || "";
-    const res = await fetch(`${backend}/api/admin-auth`, {
+    // Call the local Next.js API route so the cookie is set on the frontend domain
+    const res = await fetch(`/api/auth`, {
       method: "POST",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password }),
     }).catch(() => null);

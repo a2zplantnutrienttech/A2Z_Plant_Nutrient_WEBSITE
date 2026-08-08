@@ -494,7 +494,7 @@ async def admin_login(payload: AdminLoginPayload, response: Response):
         max_age=60 * 60 * 8,
         httponly=True,
         secure=True,
-        samesite="lax",
+        samesite="none",
         path="/",
     )
     return {"ok": True}
@@ -502,7 +502,13 @@ async def admin_login(payload: AdminLoginPayload, response: Response):
 
 @api_router.delete("/admin-auth")
 async def admin_logout(response: Response):
-    response.delete_cookie("a2z_admin", path="/")
+    response.delete_cookie(
+        key="a2z_admin", 
+        path="/", 
+        secure=True, 
+        samesite="none", 
+        httponly=True
+    )
     return {"ok": True}
 
 
