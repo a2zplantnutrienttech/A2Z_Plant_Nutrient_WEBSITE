@@ -1,0 +1,9 @@
+export async function fetchMedia(opts = {}) {
+  const params = new URLSearchParams();
+  if (opts.category) params.set("category", opts.category);
+  if (opts.media_type) params.set("media_type", opts.media_type);
+  if (opts.limit) params.set("limit", opts.limit);
+  const url = `${API_BASE}/media${params.toString() ? `?${params}` : ""}`;
+  const res = await fetch(url, { cache: "no-store" });
+  return handle(res);
+}

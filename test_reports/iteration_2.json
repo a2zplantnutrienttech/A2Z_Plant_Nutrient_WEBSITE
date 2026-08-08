@@ -1,0 +1,22 @@
+{
+  "summary": "Iteration 2 delta-verification for A2Z Plant Nutrient site. Backend: 7/7 pytest pass including new POST/GET /api/profile-requests. Frontend: tagline 'FROM TENDER TO TREE' visible on hero and mobile; hero-quote-btn + hero-projects-btn present; institutional-clients section renders all 6 client cards (NHAI, NTPC, NFL, Indian Oil, BHEL, Hindustan Copper); Request Company Profile button opens the modal (verified via screenshot). Footer address link opens Google Maps in new tab, email = mailto:info@a2zplantnutrient.com, no social icons. Careers: career-title-0 & career-apply-1 both scroll to apply-form and prepopulate selected role ('Apply Now — Mural Artist'); careers page shows info@a2zplantnutrient.com. Services: 6 service cards each have data-testid service-quote-{slug} linking to /contact. Company profile page includes 'Indian Oil' badge. Mobile nav (400x800): mobile-menu-toggle opens mobile-nav with 8 links.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Review request mentioned data-testid 'service-quote-a2z-plant-dynamic' but the actual implementation uses per-slug testids (service-quote-epc-landscaping, service-quote-large-scale-plantation, etc.). Per-slug is the correct/robust choice — flag only to keep the review doc in sync.",
+    "Company Profile modal does not have role='dialog' / aria-modal — minor a11y improvement recommended (Radix Dialog would provide this automatically)."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "N/A",
+  "seed_data_creation": "Existing seed data reused; no new seed required.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend test file at /app/backend/tests/backend_test.py now covers profile-requests. Service card quote buttons follow pattern service-quote-{slug}. Modal opened by inst-clients-request-btn does not use role='dialog' — assert via visibility of the modal content selector (e.g. text 'Request our Company Profile') instead."
+}

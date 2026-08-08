@@ -1,0 +1,37 @@
+{
+  "summary": "Iteration 3 audit. Backend 7/7 pytest pass (blogs=3 legit, careers=6 pan-India, media, contact, profile-requests, seed idempotent). PDF asset /docs/A2Z-Plant-Nutrient-Company-Profile.pdf serves 200 application/pdf (13.5MB). Admin gate middleware works: GET /admin (no cookie) -> 307 redirect to /admin-login?next=%2Fadmin. HeroCarousel with all testids (hero-carousel, carousel-primary-cta, carousel-secondary-cta, carousel-prev, carousel-next, carousel-dots) renders and next advances slide. TrustedBy section renders all client testids (trust-nhai, trust-ntpc, trust-nbcc, trust-indian-railways, trust-gsecl, trust-tcil, trust-rajasthan-housing-board). trusted-by-request-btn opens profile-request-modal. pr-direct-download href=/docs/A2Z-Plant-Nutrient-Company-Profile.pdf with correct download attr. Blog page: no blog-add-btn. Gallery: no media-add-btn; gallery-projects-btn -> /projects. Careers: 6 items, no 'demo only' text. Footer: no 'Content Dashboard'. Mobile: hero carousel + 'FROM TENDER TO TREE' visible. Projects page had a BUILD-BREAKING duplicate import of TRUSTED_BY (fixed by testing agent) — after fix all 8 project cards render including project-nhai-ayodhya, project-nhai-prayagraj, project-nbcc-wtc-delhi, project-iocl-odisha, project-nagar-nigam-varanasi, project-rajasthan-housing-board. CRITICAL admin-login BROKEN externally: /api/admin-auth is a Next.js route but K8s ingress routes all /api/* to FastAPI (port 8001), which returns 404. Locally on port 3000 the Next.js handler returns 200 + a2z_admin cookie, but from the public URL it is unreachable — so admin sign-in always fails with 'Incorrect password.' even with the correct ADMIN_TOKEN.",
+  "backend_issues": {
+    "critical": [
+      {"endpoint": "/api/admin-auth", "issue": "Next.js route handler is shadowed by K8s ingress rule that forwards all /api/* to FastAPI (port 8001). FastAPI has no such route → returns 404 {\"detail\":\"Not Found\"}. Admin login therefore fails from the external URL even with the correct password. Verified working only via http://localhost:3000/api/admin-auth (returns 200 + Set-Cookie a2z_admin).", "priority": "CRITICAL"}
+    ],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "app/projects/page.jsx", "issue": "Duplicate import of TRUSTED_BY caused a Next.js compile error (Failed to compile — 'the name TRUSTED_BY is defined multiple times'). Page returned 500 and no project cards rendered. FIXED by testing agent by consolidating imports into a single line: import { PROJECTS, CERTIFICATIONS, TRUSTED_BY, CLIENTS } from '@/lib/mock';", "selector": "N/A (build-time)", "priority": "HIGH"}
+    ],
+    "integration_issues": [
+      {"flow": "Admin login (/admin-login submit)", "issue": "POSTs to /api/admin-auth which is intercepted by ingress → FastAPI → 404. UI shows 'Incorrect password. Please try again.' even with correct ADMIN_TOKEN. Blocks all admin routes (/admin, /add-blog, /add-media).", "affected_selectors": ["admin-login-submit", "admin-login-error"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "URGENT: Move admin-auth off the /api/* prefix so it isn't shadowed by the FastAPI ingress rule. Options: (a) rename the Next.js route to a non-/api path e.g. /app/frontend/app/admin-auth/route.js exposed at /admin-auth (and update fetch URL in admin-login/page.jsx from '/api/admin-auth' to '/admin-auth'); OR (b) implement the same endpoint in FastAPI /api/admin-auth reading ADMIN_TOKEN from backend/.env and setting the a2z_admin cookie (Set-Cookie HttpOnly). Verify externally via curl -X POST https://scroll-position-bug-1.preview.emergentagent.com/<new-path> before re-testing.",
+    "Ensure ADMIN_TOKEN is exposed to the runtime environment that will host the admin-auth handler (currently only in frontend/.env; FastAPI would need it in backend/.env if moved there).",
+    "Re-test admin flow end-to-end after fix: POST returns 200 + Set-Cookie a2z_admin; subsequent GET /admin loads dashboard 200; DELETE clears cookie."
+  ],
+  "critical_code_review_comments": [
+    "app/projects/page.jsx had four separate import statements from '@/lib/mock' with duplicate TRUSTED_BY — indicative of a rushed edit; consider a lint rule (eslint no-duplicate-imports) in CI to catch this class of bug before deploy.",
+    "Admin auth architecture: relying on a Next.js /api route in an environment where /api is ingress-routed to FastAPI is a footgun. Either (i) restrict ingress to specific backend paths and let Next.js own the rest, or (ii) always place server endpoints in FastAPI. Document this in README to prevent regression.",
+    "middleware.js `secure: true` cookie is fine over HTTPS but will not be set on plain http://localhost — acceptable for deployed env; note in dev docs."
+  ],
+  "updated_files": ["/app/frontend/app/projects/page.jsx"],
+  "success_rate": {"backend": "100% (7/7 pytest)", "frontend": "94% (16/17 UI checks — only admin login fails, due to backend-routing issue above)"},
+  "test_credentials": "Admin password: A2Z-Admin-2026-Secure (from /app/frontend/.env ADMIN_TOKEN). Login flow is currently broken externally — see critical issue above.",
+  "seed_data_creation": "Existing seed reused; verified idempotent.",
+  "retest_needed": true,
+  "main_agent_can_self_test": false,
+  "context_for_next_testing_agent": "After main agent moves admin-auth off /api/*: (1) curl -si -X POST https://<url>/<new-path> -d '{\"password\":\"A2Z-Admin-2026-Secure\"}' expect 200 + Set-Cookie a2z_admin. (2) curl -si https://<url>/admin --cookie 'a2z_admin=A2Z-Admin-2026-Secure' expect 200 (not 307). (3) Playwright: navigate /admin, fill password, submit, expect URL to change to /admin. Duplicate-import lint fix already applied at /app/frontend/app/projects/page.jsx line ~11-12 — verify not reintroduced.",
+  "rca of the issue": "Kubernetes ingress config forwards every path prefixed /api to FastAPI (0.0.0.0:8001). The Next.js route handler at app/api/admin-auth/route.js is only reachable via the frontend container (localhost:3000). Since browsers hit the public URL, POST /api/admin-auth reaches FastAPI which has no matching route → 404 {\"detail\":\"Not Found\"}. Client interprets non-2xx as 'Incorrect password'. Reproduction: `curl -X POST https://scroll-position-bug-1.preview.emergentagent.com/api/admin-auth -H 'Content-Type: application/json' -d '{\"password\":\"A2Z-Admin-2026-Secure\"}'` → 404. Same request against http://localhost:3000/api/admin-auth → 200 + Set-Cookie a2z_admin. Mitigation: relocate the endpoint outside the /api/* prefix or implement it in FastAPI."
+}
