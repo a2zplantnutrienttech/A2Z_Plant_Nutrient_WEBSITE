@@ -197,13 +197,19 @@ export default function HomePage() {
         <LeafOutlineCorner className="absolute -right-20 -bottom-20 w-96 h-96 hidden md:block" opacity={0.15} />
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <FadeIn className="text-center max-w-2xl mx-auto mb-12">
-            <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-emerald-100/80 text-emerald-800 text-base font-bold uppercase tracking-[0.2em] mb-4">What We Do</span>
-            <TextReveal className="font-serif text-3xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight justify-center">Our EPC Service Portfolio</TextReveal>
-            <p className="mt-4 text-stone-600">End-to-end horticulture contracting for public and private institutions.</p>
+          <FadeIn className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
+            <div>
+              <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-emerald-100/80 text-emerald-800 text-base font-bold uppercase tracking-[0.2em] mb-4">What We Do</span>
+              <TextReveal className="font-serif text-3xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight justify-center">Our EPC Service Portfolio</TextReveal>
+              <p className="mt-4 text-stone-600">End-to-end horticulture contracting for public and private institutions.</p>
+            </div>
+            <Button asChild variant="outline" className="rounded-full border-emerald-700 text-emerald-700 hover:bg-emerald-50 self-start md:self-auto">
+              <Link href="/services">View All Services <ArrowRight size={16} className="ml-1" /></Link>
+            </Button>
           </FadeIn>
-          <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {SERVICES.slice(0, 6).map((s) => (
+          
+          <Stagger className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+            {SERVICES.slice(0, 3).map((s) => (
               <StaggerItem key={s.slug}>
                 <Card className="group overflow-hidden border-stone-200 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 h-full">
                   <div className="relative aspect-[4/3] overflow-hidden">
@@ -229,6 +235,38 @@ export default function HomePage() {
               </StaggerItem>
             ))}
           </Stagger>
+
+          {/* PROCESS SECTION REPLACES THE 3 REMOVED CARDS */}
+          <div className="border-t border-stone-200 pt-16 mt-10">
+            <FadeIn className="text-center max-w-2xl mx-auto mb-12">
+              <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-[0.2em] mb-4">Our Process</span>
+              <h2 className="font-serif text-3xl md:text-4xl text-emerald-950 font-semibold mt-3 leading-tight">From Soil to Scenery</h2>
+              <p className="mt-3 text-stone-600">A seamless, engineering-led journey from initial assessment to your long-term green space.</p>
+            </FadeIn>
+            
+            <Stagger className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 relative">
+              {[
+                { step: "01", title: "Site Audit", desc: "Scientific soil & terrain analysis." },
+                { step: "02", title: "Design", desc: "Custom, compliant blueprints." },
+                { step: "03", title: "Sourcing", desc: "Premium native flora procurement." },
+                { step: "04", title: "Execution", desc: "Hardscaping & rapid planting." },
+                { step: "05", title: "Handover", desc: "Delivery with full quality sign-off." },
+                { step: "06", title: "AMC", desc: "Multi-year maintenance care." },
+              ].map((p, i) => (
+                <StaggerItem key={i} className="relative z-10">
+                  <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 h-full hover:border-emerald-300 hover:bg-emerald-50/50 transition-colors relative group">
+                    <div className="text-3xl font-serif font-black text-emerald-100 group-hover:text-emerald-200 absolute top-4 right-4 transition-colors">
+                      {p.step}
+                    </div>
+                    <div className="relative z-10 mt-6">
+                      <h4 className="font-semibold text-emerald-950 text-base">{p.title}</h4>
+                      <p className="text-stone-500 text-xs mt-2 leading-relaxed">{p.desc}</p>
+                    </div>
+                  </div>
+                </StaggerItem>
+              ))}
+            </Stagger>
+          </div>
         </div>
       </section>
 
