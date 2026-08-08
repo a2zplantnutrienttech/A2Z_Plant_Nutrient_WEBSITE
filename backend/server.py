@@ -229,26 +229,33 @@ async def delete_blog(blog_id: str):
 # ---------- Media ----------
 @api_router.post("/media", response_model=Media)
 async def create_media(payload: MediaCreate):
-    media = Media(**payload.model_dump())
-    await db.media.insert_one(media.model_dump())
-    return media
+    data = payload.model_dump()
+    data["image_url"] = data.pop("data")
+    res = db.table("media").insert(data).execute()
+    row = res.data[0]
+    row["data"] = row.pop("image_url")
+    return row
 
 
 @api_router.get("/media", response_model=List[Media])
 async def list_media(category: Optional[str] = None, media_type: Optional[str] = None, limit: int = 500):
-    query = {}
+    query = db.table("media").select("*").order("created_at", desc=True).limit(limit)
     if category:
-        query["category"] = category
+        query = query.eq("category", category)
     if media_type:
-        query["media_type"] = media_type
-    docs = await db.media.find(query, {"_id": 0}).sort("created_at", -1).to_list(limit)
+        query = query.eq("media_type", media_type)
+    res = query.execute()
+    docs = []
+    for row in res.data:
+        row["data"] = row.pop("image_url")
+        docs.append(row)
     return docs
 
 
 @api_router.delete("/media/{media_id}")
 async def delete_media(media_id: str):
-    result = await db.media.delete_one({"id": media_id})
-    if result.deleted_count == 0:
+    res = db.table("media").delete().eq("id", media_id).execute()
+    if not res.data:
         raise HTTPException(status_code=404, detail="Media not found")
     return {"ok": True, "deleted": media_id}
 
@@ -687,10 +694,11 @@ async def seed():
     {"title": "A2Z Project Execution 166", "category": "Project Work", "media_type": "image", "data": "/gallery/proj_166.jpeg", "description": "On-ground execution and landscape maintenance by A2Z Plant Nutrient."},
 ]
     for m in initial_media:
-        exists = await db.media.find_one({"title": m["title"]})
-        if not exists:
+        res = db.table("media").select("id").eq("title", m["title"]).execute()
+        if not res.data:
             doc = Media(**m).model_dump()
-            await db.media.insert_one(doc)
+            doc["image_url"] = doc.pop("data")
+            db.table("media").insert(doc).execute()
             seeded["media"] += 1
 
     return {"ok": True, "seeded": seeded}
