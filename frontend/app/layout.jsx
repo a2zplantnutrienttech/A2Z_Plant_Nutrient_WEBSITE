@@ -5,6 +5,7 @@ import FloatingActions from "@/components/FloatingActions";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
+  metadataBase: new URL('https://www.a2zplantnutrient.com'),
   title: {
     template: "%s | A2Z Plant Nutrient",
     default: "A2Z Plant Nutrient | EPC Commercial Horticulture & Landscaping Partners",
@@ -46,6 +47,26 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="bg-stone-50 min-h-screen antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "name": "A2Z Plant Nutrient",
+              "image": "https://www.a2zplantnutrient.com/logo.png",
+              "description": "India's trusted EPC Partner for commercial horticulture, sustainable landscaping, and large-scale plantation projects. ISO 9001 & 14001 certified vendor for PSUs & Government.",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Varanasi",
+                "addressRegion": "UP",
+                "addressCountry": "IN"
+              },
+              "telephone": "+919451152065",
+              "url": "https://www.a2zplantnutrient.com"
+            })
+          }}
+        />
         <Header />
         <main>{children}</main>
         <Footer />

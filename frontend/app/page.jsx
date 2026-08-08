@@ -25,6 +25,7 @@ import Counter from "@/components/Counter";
 import HeroCarousel from "@/components/HeroCarousel";
 import TrustedBy from "@/components/TrustedBy";
 import ProfileRequestModal from "@/components/ProfileRequestModal";
+import Faq from "@/components/Faq";
 import {
   WatercolorBranchLeft,
   WatercolorBranchRight,
@@ -305,6 +306,9 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      {/* FAQ SECTION */}
+      <Faq />
 
       {/* PROCUREMENT CTA */}
       <section className="py-20 bg-emerald-950 text-white" id="request-profile" data-testid="procurement-cta">
