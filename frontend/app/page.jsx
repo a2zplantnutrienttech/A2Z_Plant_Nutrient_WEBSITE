@@ -238,40 +238,63 @@ export default function HomePage() {
 
           {/* PREMIUM PROCESS SECTION */}
           <div className="border-t border-stone-200 pt-20 mt-10">
-            <FadeIn className="text-center max-w-3xl mx-auto mb-16">
-              <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold uppercase tracking-[0.2em] mb-4">The EPC Blueprint</span>
-              <h2 className="font-serif text-3xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight">From Soil to Scenery</h2>
-              <p className="mt-4 text-stone-600 text-lg">A systematic, engineering-led methodology transforming raw terrain into thriving, sustainable ecosystems.</p>
-            </FadeIn>
-            
-            <Stagger className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
-              {[
-                { step: "01", title: "Site Audit", desc: "Scientific soil & terrain analysis, assessing microclimates and environmental constraints.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219643/a2z/process/ti4oc7nlotcycizfecu8.png" },
-                { step: "02", title: "Design Strategy", desc: "Custom, compliant blueprints mapping out sustainable, long-term green infrastructure.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219661/a2z/process/shqg0osprprhs59431ca.png" },
-                { step: "03", title: "Procurement", desc: "Sourcing premium, climate-resilient native flora direct from our audited nursery network.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219678/a2z/process/v8emc19jfdri2pmxikqe.png" },
-                { step: "04", title: "Execution", desc: "Precision heavy hardscaping, structural soil amendments, and rapid plantation.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219695/a2z/process/i9y5vkfqigufsseliu3o.png" },
-                { step: "05", title: "Handover", desc: "Seamless project delivery with rigorous quality sign-offs and digital geotagged reports.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219710/a2z/process/kmqubll4fjqtrlgwmzq2.png" },
-                { step: "06", title: "Maintenance", desc: "Multi-year AMC providing continuous agronomic care to guarantee survival and growth.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219726/a2z/process/knhietdntvuqrydnynce.png" },
-              ].map((p, i) => (
-                <StaggerItem key={i} className="relative z-10 h-full">
-                  <div className="group rounded-2xl overflow-hidden bg-stone-50 border border-stone-200 hover:shadow-xl hover:border-emerald-300 transition-all duration-500 h-full flex flex-col">
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      <img src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-emerald-950/20 to-transparent opacity-80" />
-                      <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-serif font-bold border border-white/30">
-                        {p.step}
-                      </div>
-                      <div className="absolute bottom-4 left-5 right-5">
-                        <h4 className="font-serif text-2xl text-white font-semibold">{p.title}</h4>
-                      </div>
-                    </div>
-                    <div className="p-6 flex-1 flex flex-col">
-                      <p className="text-stone-600 text-sm leading-relaxed">{p.desc}</p>
+            <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+              {/* Sticky Left Column */}
+              <div className="lg:col-span-5 lg:sticky lg:top-32">
+                <FadeIn>
+                  <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold uppercase tracking-[0.2em] mb-4">
+                    The EPC Blueprint
+                  </span>
+                  <h2 className="font-serif text-4xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight">
+                    From Soil to Scenery
+                  </h2>
+                  <p className="mt-5 text-stone-600 text-lg leading-relaxed">
+                    A systematic, engineering-led methodology transforming raw terrain into thriving, sustainable ecosystems.
+                  </p>
+                  
+                  {/* Real image to build trust, no AI */}
+                  <div className="mt-10 rounded-2xl overflow-hidden relative aspect-[4/3] shadow-lg border border-stone-200 hidden md:block">
+                    <img src="/real-avenue-install-day.jpg" alt="A2Z Plant Nutrient Execution Team" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-emerald-900/10 mix-blend-multiply"></div>
+                    <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur rounded-xl p-4 flex items-center gap-4 border border-stone-100">
+                      <ShieldCheck className="text-emerald-700 shrink-0" size={24} />
+                      <div className="text-xs text-stone-600 font-medium">100% in-house workforce and heavy machinery. No sub-contracting risks.</div>
                     </div>
                   </div>
-                </StaggerItem>
-              ))}
-            </Stagger>
+                </FadeIn>
+              </div>
+
+              {/* Right Column - Premium Vertical Timeline */}
+              <div className="lg:col-span-7 lg:pl-10">
+                <Stagger className="space-y-8 md:space-y-12">
+                  {[
+                    { step: "01", title: "Site Audit", desc: "Scientific soil & terrain analysis, assessing microclimates and environmental constraints to inform our strategy." },
+                    { step: "02", title: "Design Strategy", desc: "Custom, compliant blueprints mapping out sustainable, long-term green infrastructure tailored to your site." },
+                    { step: "03", title: "Procurement", desc: "Sourcing premium, climate-resilient native flora direct from our audited nursery network across India." },
+                    { step: "04", title: "Execution", desc: "Precision heavy hardscaping, structural soil amendments, and rapid, large-scale plantation by our expert workforce." },
+                    { step: "05", title: "Handover", desc: "Seamless project delivery with rigorous quality sign-offs, survival rate checks, and digital geotagged reports." },
+                    { step: "06", title: "Maintenance", desc: "Multi-year Annual Maintenance Contracts (AMC) providing continuous agronomic care to guarantee survival and growth." },
+                  ].map((p, i) => (
+                    <StaggerItem key={i} className="relative pl-12 md:pl-16">
+                      {/* Vertical connecting line */}
+                      {i !== 5 && (
+                        <div className="absolute left-[19px] top-12 bottom-[-40px] md:bottom-[-56px] w-px bg-stone-200"></div>
+                      )}
+                      
+                      {/* Timeline Dot */}
+                      <div className="absolute left-0 top-1.5 w-[38px] h-[38px] rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-xs font-bold text-emerald-800 shadow-sm">
+                        {p.step}
+                      </div>
+                      
+                      <div className="bg-white border border-stone-100 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+                        <h4 className="font-serif text-2xl text-emerald-950 font-semibold">{p.title}</h4>
+                        <p className="mt-3 text-stone-600 leading-relaxed text-sm md:text-base">{p.desc}</p>
+                      </div>
+                    </StaggerItem>
+                  ))}
+                </Stagger>
+              </div>
+            </div>
           </div>
         </div>
       </section>
