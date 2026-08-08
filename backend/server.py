@@ -256,29 +256,55 @@ async def delete_media(media_id: str):
 # ---------- Careers ----------
 @api_router.post("/careers", response_model=Career)
 async def create_career(payload: CareerCreate):
-    career = Career(**payload.model_dump())
-    await db.careers.insert_one(career.model_dump())
-    return career
+    data = payload.model_dump()
+    data["description"] = data.pop("desc", "")
+    res = db.table("careers").insert(data).execute()
+    row = res.data[0]
+    row["desc"] = row.pop("description", "")
+    return row
 
 
 @api_router.get("/careers", response_model=List[Career])
 async def list_careers():
-    docs = await db.careers.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    res = db.table("careers").select("*").order("created_at", desc=True).limit(100).execute()
+    docs = []
+    for row in res.data:
+        row["desc"] = row.pop("description", "")
+        docs.append(row)
     return docs
 
 
 @api_router.delete("/careers/{career_id}")
 async def delete_career(career_id: str):
-    result = await db.careers.delete_one({"id": career_id})
-    if result.deleted_count == 0:
+    res = db.table("careers").delete().eq("id", career_id).execute()
+    if not res.data:
         raise HTTPException(status_code=404, detail="Career not found")
     return {"ok": True, "deleted": career_id}
 
 
+import base64
+
 @api_router.post("/apply")
 async def create_application(payload: ApplicationCreate):
-    app = Application(**payload.model_dump())
-    await db.applications.insert_one(app.model_dump())
+    # Upload resume to Supabase Storage
+    header, b64_data = payload.resume.split(",", 1)
+    mime_type = header.split(":")[1].split(";")[0]
+    ext = "pdf" if "pdf" in mime_type else "doc"
+    file_bytes = base64.b64decode(b64_data)
+    
+    file_name = f"resumes/{uuid.uuid4()}.{ext}"
+    db.storage.from_("media-bucket").upload(file_name, file_bytes, {"content-type": mime_type})
+    public_url = db.storage.from_("media-bucket").get_public_url(file_name)
+    
+    data = payload.model_dump()
+    data.pop("resume")
+    data["resume_url"] = public_url
+    data["resume_public_id"] = file_name
+    
+    res = db.table("applications").insert(data).execute()
+    app_data = res.data[0]
+    app_data["resume"] = payload.resume
+    app = Application(**app_data)
     
     # Try sending an email to site admin
     if resend.api_key:
@@ -294,17 +320,10 @@ async def create_application(payload: ApplicationCreate):
             <p><i>Resume attached below.</i></p>
             """
             
-            attachments = []
-            if payload.resume.startswith("data:"):
-                # parse base64
-                header, b64_data = payload.resume.split(",", 1)
-                mime_type = header.split(":")[1].split(";")[0]
-                ext = "pdf" if "pdf" in mime_type else "doc"
-                
-                attachments.append({
-                    "filename": f"resume_{payload.name.replace(' ', '_')}.{ext}",
-                    "content": b64_data
-                })
+            attachments = [{
+                "filename": f"resume_{payload.name.replace(' ', '_')}.{ext}",
+                "content": b64_data
+            }]
             
             # Send notification to admin
             params = {
@@ -492,10 +511,11 @@ async def seed():
          "desc": "Coordinate landscape maintenance operations across IOCL, Odisha facilities."},
     ]
     for c in initial_careers:
-        exists = await db.careers.find_one({"title": c["title"]})
-        if not exists:
+        res = db.table("careers").select("id").eq("title", c["title"]).execute()
+        if not res.data:
+            c["description"] = c.pop("desc")
             doc = Career(**c).model_dump()
-            await db.careers.insert_one(doc)
+            db.table("careers").insert(doc).execute()
             seeded["careers"] += 1
 
     initial_media = [
