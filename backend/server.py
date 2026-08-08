@@ -324,7 +324,7 @@ async def create_application(payload: ApplicationCreate):
 @api_router.post("/contact", response_model=Contact)
 async def create_contact(payload: ContactCreate):
     msg = Contact(**payload.model_dump())
-    await db.contacts.insert_one(msg.model_dump())
+    res = db.table("contacts").insert(msg.model_dump()).execute()
     
     # Try sending an email to site admin
     if resend.api_key:
@@ -357,7 +357,7 @@ async def create_contact(payload: ContactCreate):
 @api_router.post("/profile-requests", response_model=ProfileRequest)
 async def create_profile_request(payload: ProfileRequestCreate):
     req = ProfileRequest(**payload.model_dump())
-    await db.profile_requests.insert_one(req.model_dump())
+    res = db.table("profile_requests").insert(req.model_dump()).execute()
     
     if resend.api_key:
         try:
@@ -386,8 +386,8 @@ async def create_profile_request(payload: ProfileRequestCreate):
 
 @api_router.get("/profile-requests", response_model=List[ProfileRequest])
 async def list_profile_requests():
-    docs = await db.profile_requests.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
-    return docs
+    res = db.table("profile_requests").select("*").order("created_at", desc=True).limit(200).execute()
+    return res.data
 
 
 # ---------- Admin auth (shared password, session cookie) ----------
