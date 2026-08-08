@@ -240,18 +240,18 @@ export default function HomePage() {
           <div className="border-t border-stone-200 pt-20 mt-10">
             <FadeIn className="text-center max-w-3xl mx-auto mb-16">
               <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold uppercase tracking-[0.2em] mb-4">The EPC Blueprint</span>
-              <h2 className="font-serif text-3xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight">Mastering the Landscape</h2>
-              <p className="mt-4 text-stone-600 text-lg">A systematic methodology transforming raw terrain into thriving, sustainable ecosystems.</p>
+              <h2 className="font-serif text-3xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight">From Soil to Scenery</h2>
+              <p className="mt-4 text-stone-600 text-lg">A systematic, engineering-led methodology transforming raw terrain into thriving, sustainable ecosystems.</p>
             </FadeIn>
             
             <Stagger className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
               {[
-                { step: "01", title: "Site Audit", desc: "Scientific soil & terrain analysis, assessing microclimates and environmental constraints.", img: "/real-paver-walkway2.jpg" },
-                { step: "02", title: "Design Strategy", desc: "Custom, compliant blueprints mapping out sustainable, long-term green infrastructure.", img: "/real-apartment-landscape.jpg" },
-                { step: "03", title: "Procurement", desc: "Sourcing premium, climate-resilient native flora direct from our audited nursery network.", img: "/real-nursery-delivery.jpg" },
-                { step: "04", title: "Execution", desc: "Precision heavy hardscaping, structural soil amendments, and rapid plantation.", img: "/real-avenue-install-day.jpg" },
-                { step: "05", title: "Handover", desc: "Seamless project delivery with rigorous quality sign-offs and digital geotagged reports.", img: "/real-private-garden.jpg" },
-                { step: "06", title: "Maintenance", desc: "Multi-year AMC providing continuous agronomic care to guarantee survival and growth.", img: "/real-iocl-odisha-maintenance.jpg" },
+                { step: "01", title: "Site Audit", desc: "Scientific soil & terrain analysis, assessing microclimates and environmental constraints.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219643/a2z/process/ti4oc7nlotcycizfecu8.png" },
+                { step: "02", title: "Design Strategy", desc: "Custom, compliant blueprints mapping out sustainable, long-term green infrastructure.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219661/a2z/process/shqg0osprprhs59431ca.png" },
+                { step: "03", title: "Procurement", desc: "Sourcing premium, climate-resilient native flora direct from our audited nursery network.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219678/a2z/process/v8emc19jfdri2pmxikqe.png" },
+                { step: "04", title: "Execution", desc: "Precision heavy hardscaping, structural soil amendments, and rapid plantation.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219695/a2z/process/i9y5vkfqigufsseliu3o.png" },
+                { step: "05", title: "Handover", desc: "Seamless project delivery with rigorous quality sign-offs and digital geotagged reports.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219710/a2z/process/kmqubll4fjqtrlgwmzq2.png" },
+                { step: "06", title: "Maintenance", desc: "Multi-year AMC providing continuous agronomic care to guarantee survival and growth.", img: "https://res.cloudinary.com/ckeyebqv/image/upload/v1786219726/a2z/process/knhietdntvuqrydnynce.png" },
               ].map((p, i) => (
                 <StaggerItem key={i} className="relative z-10 h-full">
                   <div className="group rounded-2xl overflow-hidden bg-stone-50 border border-stone-200 hover:shadow-xl hover:border-emerald-300 transition-all duration-500 h-full flex flex-col">
