@@ -178,6 +178,10 @@ class ProfileRequest(ProfileRequestCreate):
 async def root():
     return {"message": "A2Z Plant Nutrient API is running", "ok": True}
 
+@api_router.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
 
 # ---------- Blog ----------
 @api_router.post("/blogs", response_model=Blog)
@@ -751,7 +755,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=os.environ.get('CORS_ORIGINS', 'https://a2zplantnutrient.com,https://www.a2zplantnutrient.com,http://localhost:3000').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
