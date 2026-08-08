@@ -16,6 +16,15 @@ ROOT_DIR = Path(__file__).parent
 import resend
 load_dotenv(ROOT_DIR / '.env')
 import asyncio
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET")
+)
+
 resend.api_key = os.environ.get("RESEND_API_KEY", "")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
 
@@ -178,7 +187,15 @@ async def create_blog(payload: BlogCreate):
     res = db.table("blogs").select("id").eq("slug", slug).execute()
     if res.data:
         slug = f"{slug}-{str(uuid.uuid4())[:6]}"
-    blog = Blog(**payload.model_dump(exclude={"slug"}), slug=slug)
+        
+    data = payload.model_dump(exclude={"slug"})
+    
+    if data.get("cover_image") and data["cover_image"].startswith("data:"):
+        # upload to cloudinary
+        upload_result = cloudinary.uploader.upload(data["cover_image"], folder="a2z/blogs")
+        data["cover_image"] = upload_result.get("secure_url")
+        
+    blog = Blog(**data, slug=slug)
     res = db.table("blogs").insert(blog.model_dump()).execute()
     return res.data[0]
 
@@ -211,6 +228,11 @@ async def update_blog(blog_id: str, payload: BlogCreate):
     
     update_data = payload.model_dump(exclude_unset=True, exclude={"slug"})
     update_data["updated_at"] = now_iso()
+    
+    if update_data.get("cover_image") and update_data["cover_image"].startswith("data:"):
+        upload_result = cloudinary.uploader.upload(update_data["cover_image"], folder="a2z/blogs")
+        update_data["cover_image"] = upload_result.get("secure_url")
+        
     if payload.slug and payload.slug != existing.get("slug"):
         update_data["slug"] = payload.slug
     
@@ -230,7 +252,16 @@ async def delete_blog(blog_id: str):
 @api_router.post("/media", response_model=Media)
 async def create_media(payload: MediaCreate):
     data = payload.model_dump()
-    data["image_url"] = data.pop("data")
+    raw_data = data.pop("data")
+    
+    if raw_data.startswith("data:"):
+        upload_result = cloudinary.uploader.upload(raw_data, folder="a2z/media")
+        data["image_url"] = upload_result.get("secure_url")
+        data["public_id"] = upload_result.get("public_id")
+    else:
+        data["image_url"] = raw_data
+        data["public_id"] = None
+        
     res = db.table("media").insert(data).execute()
     row = res.data[0]
     row["data"] = row.pop("image_url")
@@ -254,9 +285,18 @@ async def list_media(category: Optional[str] = None, media_type: Optional[str] =
 
 @api_router.delete("/media/{media_id}")
 async def delete_media(media_id: str):
+    res_select = db.table("media").select("public_id").eq("id", media_id).execute()
+    
     res = db.table("media").delete().eq("id", media_id).execute()
     if not res.data:
         raise HTTPException(status_code=404, detail="Media not found")
+        
+    if res_select.data and res_select.data[0].get("public_id"):
+        try:
+            cloudinary.uploader.destroy(res_select.data[0]["public_id"])
+        except Exception as e:
+            logger.error(f"Failed to delete from Cloudinary: {e}")
+            
     return {"ok": True, "deleted": media_id}
 
 
@@ -293,20 +333,21 @@ import base64
 
 @api_router.post("/apply")
 async def create_application(payload: ApplicationCreate):
-    # Upload resume to Supabase Storage
+    # Upload resume to Cloudinary
     header, b64_data = payload.resume.split(",", 1)
     mime_type = header.split(":")[1].split(";")[0]
     ext = "pdf" if "pdf" in mime_type else "doc"
-    file_bytes = base64.b64decode(b64_data)
     
-    file_name = f"resumes/{uuid.uuid4()}.{ext}"
-    db.storage.from_("media-bucket").upload(file_name, file_bytes, {"content-type": mime_type})
-    public_url = db.storage.from_("media-bucket").get_public_url(file_name)
+    upload_result = cloudinary.uploader.upload(
+        payload.resume,
+        folder="a2z/resumes",
+        resource_type="auto"
+    )
     
     data = payload.model_dump()
     data.pop("resume")
-    data["resume_url"] = public_url
-    data["resume_public_id"] = file_name
+    data["resume_url"] = upload_result.get("secure_url")
+    data["resume_public_id"] = upload_result.get("public_id")
     
     res = db.table("applications").insert(data).execute()
     app_data = res.data[0]
