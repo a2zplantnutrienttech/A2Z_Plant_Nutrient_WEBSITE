@@ -175,54 +175,53 @@ async def root():
 async def create_blog(payload: BlogCreate):
     slug = (payload.slug or slugify(payload.title))
     # ensure unique slug
-    if await db.blogs.find_one({"slug": slug}):
+    res = db.table("blogs").select("id").eq("slug", slug).execute()
+    if res.data:
         slug = f"{slug}-{str(uuid.uuid4())[:6]}"
     blog = Blog(**payload.model_dump(exclude={"slug"}), slug=slug)
-    await db.blogs.insert_one(blog.model_dump())
-    return blog
+    res = db.table("blogs").insert(blog.model_dump()).execute()
+    return res.data[0]
 
 
 @api_router.get("/blogs", response_model=List[Blog])
 async def list_blogs(category: Optional[str] = None, q: Optional[str] = None, limit: int = 100):
-    query = {}
+    query = db.table("blogs").select("*").order("created_at", desc=True).limit(limit)
     if category:
-        query["category"] = category
+        query = query.eq("category", category)
     if q:
-        query["$or"] = [
-            {"title": {"$regex": q, "$options": "i"}},
-            {"excerpt": {"$regex": q, "$options": "i"}},
-            {"content": {"$regex": q, "$options": "i"}},
-        ]
-    docs = await db.blogs.find(query, {"_id": 0}).sort("created_at", -1).to_list(limit)
-    return docs
+        query = query.or_(f"title.ilike.%{q}%,excerpt.ilike.%{q}%,content.ilike.%{q}%")
+    res = query.execute()
+    return res.data
 
 
 @api_router.get("/blogs/{slug}", response_model=Blog)
 async def get_blog(slug: str):
-    doc = await db.blogs.find_one({"slug": slug}, {"_id": 0})
-    if not doc:
+    res = db.table("blogs").select("*").eq("slug", slug).execute()
+    if not res.data:
         raise HTTPException(status_code=404, detail="Blog not found")
-    return doc
+    return res.data[0]
 
 
 @api_router.put("/blogs/{blog_id}", response_model=Blog)
 async def update_blog(blog_id: str, payload: BlogCreate):
-    existing = await db.blogs.find_one({"id": blog_id}, {"_id": 0})
-    if not existing:
+    res = db.table("blogs").select("slug").eq("id", blog_id).execute()
+    if not res.data:
         raise HTTPException(status_code=404, detail="Blog not found")
+    existing = res.data[0]
+    
     update_data = payload.model_dump(exclude_unset=True, exclude={"slug"})
     update_data["updated_at"] = now_iso()
     if payload.slug and payload.slug != existing.get("slug"):
         update_data["slug"] = payload.slug
-    await db.blogs.update_one({"id": blog_id}, {"$set": update_data})
-    doc = await db.blogs.find_one({"id": blog_id}, {"_id": 0})
-    return doc
+    
+    res = db.table("blogs").update(update_data).eq("id", blog_id).execute()
+    return res.data[0]
 
 
 @api_router.delete("/blogs/{blog_id}")
 async def delete_blog(blog_id: str):
-    result = await db.blogs.delete_one({"id": blog_id})
-    if result.deleted_count == 0:
+    res = db.table("blogs").delete().eq("id", blog_id).execute()
+    if not res.data:
         raise HTTPException(status_code=404, detail="Blog not found")
     return {"ok": True, "deleted": blog_id}
 
@@ -471,11 +470,11 @@ async def seed():
         },
     ]
     for b in initial_blogs:
-        exists = await db.blogs.find_one({"title": b["title"]})
-        if not exists:
+        res = db.table("blogs").select("id").eq("title", b["title"]).execute()
+        if not res.data:
             slug = slugify(b["title"])
             doc = Blog(**b, slug=slug).model_dump()
-            await db.blogs.insert_one(doc)
+            db.table("blogs").insert(doc).execute()
             seeded["blogs"] += 1
 
     initial_careers = [
@@ -695,7 +694,8 @@ logger = logging.getLogger(__name__)
 async def startup_seed():
     """Auto-seed initial content on startup if collections are empty."""
     try:
-        if await db.blogs.count_documents({}) == 0:
+        res = db.table("blogs").select("id", count="exact").execute()
+        if res.count == 0:
             from fastapi import Request  # noqa
             await seed()
             logger.info("Auto-seed completed.")
