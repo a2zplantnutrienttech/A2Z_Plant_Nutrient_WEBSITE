@@ -39,7 +39,7 @@ export const NAV = [
   { label: "Gallery", path: "/gallery" },
   { label: "Careers", path: "/careers" },
   { label: "Blog", path: "/blog" },
-  { label: "FAQ", path: "/#faq" },
+  { label: "FAQ", path: "/faq" },
   { label: "Contact", path: "/contact" },
 ];
 

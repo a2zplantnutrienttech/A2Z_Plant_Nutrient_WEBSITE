@@ -10,6 +10,7 @@ export default async function sitemap() {
     "/projects",
     "/gallery",
     "/careers",
+    "/faq",
     "/contact",
     "/company-profile"
   ].map((route) => ({

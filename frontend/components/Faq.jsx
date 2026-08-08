@@ -10,8 +10,24 @@ const faqs = [
     answer: "EPC (Engineering, Procurement, and Construction) commercial horticulture involves end-to-end management of large-scale landscaping and plantation projects, primarily for government and corporate sectors. We handle everything from soil testing and plant procurement to execution and long-term maintenance."
   },
   {
-    question: "What certifications does A2Z Plant Nutrient hold?",
-    answer: "We are an ISO 9001 (Quality Management) and ISO 14001 (Environmental Management) certified vendor. We are also recognized by DPIIT under the Startup India initiative."
+    question: "What is the difference between commercial landscaping and EPC horticulture?",
+    answer: "While commercial landscaping typically focuses on aesthetics and design, EPC horticulture is a comprehensive, engineering-led approach. It includes site preparation, structural soil amendments, mass procurement, heavy equipment execution, and multi-year scientific maintenance linked to strict survival rate KPIs."
+  },
+  {
+    question: "How does compensatory afforestation work for highway projects?",
+    answer: "Compensatory afforestation mandates that trees removed during highway construction (e.g., NHAI projects) must be replanted in a specific ratio. We manage this end-to-end: sourcing native species, executing the plantation on designated forest or non-forest land, and maintaining them for 3-5 years with geotagged digital reporting."
+  },
+  {
+    question: "What is included in a horticulture Annual Maintenance Contract (AMC)?",
+    answer: "A comprehensive AMC includes regular watering, weeding, pruning, pest and disease management, fertilizer application (fertigation), casualty replacement, and debris clearance. For PSUs and townships, we deploy dedicated horticulturalists and site supervisors."
+  },
+  {
+    question: "Which plants are best for industrial and PSU townships in India?",
+    answer: "We select hardy, native, and pollution-tolerant species such as Neem, Peepal, Kaner, and Alstonia for peripheral green belts to absorb dust and noise. For residential zones within townships, we use ornamental, low-maintenance shade trees and flowering shrubs suited to the local agro-climatic zone."
+  },
+  {
+    question: "Why choose an ISO-certified vendor for government landscaping tenders?",
+    answer: "ISO 9001 (Quality) and ISO 14001 (Environmental) certifications ensure that the vendor follows standardized, globally recognized processes. For government agencies like CPWD, NBCC, and NHAI, these certifications mitigate risk, ensure compliance, and guarantee reliable execution and documentation."
   },
   {
     question: "Do you execute projects across India?",
@@ -27,7 +43,7 @@ const faqs = [
   }
 ];
 
-export default function Faq() {
+export default function Faq({ className = "py-20 bg-stone-50" }) {
   const [openIndex, setOpenIndex] = useState(null);
 
   const toggle = (i) => {
@@ -49,7 +65,7 @@ export default function Faq() {
   };
 
   return (
-    <section className="py-20 bg-stone-50 relative overflow-hidden" id="faq">
+    <section className={`relative overflow-hidden ${className}`} id="faq">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
