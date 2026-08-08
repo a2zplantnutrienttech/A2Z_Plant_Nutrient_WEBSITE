@@ -271,6 +271,72 @@ async def create_media(payload: MediaCreate):
     row["data"] = row.pop("image_url")
     return row
 
+import zipfile
+import io
+from fastapi import UploadFile, File, Form
+
+@api_router.post("/media/zip")
+async def upload_media_zip(
+    file: UploadFile = File(...),
+    title: str = Form(...),
+    category: str = Form("Gallery"),
+    media_type: str = Form("image"),
+    description: str = Form("")
+):
+    if not file.filename.endswith('.zip'):
+        raise HTTPException(status_code=400, detail="File must be a ZIP archive")
+        
+    content = await file.read()
+    
+    try:
+        with zipfile.ZipFile(io.BytesIO(content)) as z:
+            image_files = []
+            for name in z.namelist():
+                if name.startswith('__MACOSX/') or '/.' in name or name.startswith('.'):
+                    continue
+                ext = name.lower().split('.')[-1]
+                if ext in ['png', 'jpg', 'jpeg', 'webp', 'gif']:
+                    image_files.append(name)
+                    
+            image_files.sort()
+            
+            uploaded_media = []
+            for idx, img_name in enumerate(image_files):
+                img_data = z.read(img_name)
+                
+                upload_result = cloudinary.uploader.upload(
+                    io.BytesIO(img_data), 
+                    folder="a2z/media",
+                    resource_type="image"
+                )
+                
+                current_title = f"{title} {idx + 1}" if len(image_files) > 1 else title
+                
+                doc = {
+                    "title": current_title,
+                    "description": description,
+                    "category": category,
+                    "media_type": media_type,
+                    "image_url": upload_result.get("secure_url"),
+                    "public_id": upload_result.get("public_id"),
+                    "id": str(uuid.uuid4()),
+                    "created_at": now_iso(),
+                    "updated_at": now_iso()
+                }
+                
+                res = db.table("media").insert(doc).execute()
+                row = res.data[0]
+                row["data"] = row.pop("image_url")
+                uploaded_media.append(row)
+                
+            return {"ok": True, "uploaded": len(uploaded_media), "media": uploaded_media}
+            
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=400, detail="Invalid ZIP file")
+    except Exception as e:
+        logger.error(f"ZIP upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @api_router.get("/media", response_model=List[Media])
 async def list_media(category: Optional[str] = None, media_type: Optional[str] = None, limit: int = 500):

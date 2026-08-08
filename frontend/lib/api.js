@@ -70,6 +70,14 @@ export async function createMedia(payload) {
   return handle(res);
 }
 
+export async function uploadMediaZip(formData) {
+  const res = await fetch(`${API_BASE}/media/zip`, {
+    method: "POST",
+    body: formData, // Do not set Content-Type header; browser sets it with boundaries
+  });
+  return handle(res);
+}
+
 export async function deleteMedia(id) {
   const res = await fetch(`${API_BASE}/media/${id}`, { method: "DELETE" });
   return handle(res);

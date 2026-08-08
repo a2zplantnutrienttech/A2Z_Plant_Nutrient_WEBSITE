@@ -260,6 +260,51 @@ def test_delete_media(media_id: str):
         results.add_fail("Delete Media", str(e))
     return False
 
+def test_upload_media_zip():
+    """Test uploading a ZIP file with multiple images"""
+    import zipfile
+    import io
+    import tempfile
+    from PIL import Image
+    
+    try:
+        # Create a temporary ZIP file with test images
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            # Create 3 test images
+            for i in range(1, 4):
+                img = Image.new('RGB', (100, 100), color=(255, 0, 0))
+                img_buffer = io.BytesIO()
+                img.save(img_buffer, format='PNG')
+                img_buffer.seek(0)
+                zip_file.writestr(f'test_image_{i}.png', img_buffer.getvalue())
+        
+        zip_buffer.seek(0)
+        
+        # Prepare multipart form data
+        files = {'file': ('test_images.zip', zip_buffer, 'application/zip')}
+        data = {
+            'title': 'Test ZIP Upload',
+            'category': 'Testing',
+            'media_type': 'image',
+            'description': 'Test ZIP upload from automated test suite'
+        }
+        
+        response = requests.post(f"{BASE_URL}/media/zip", files=files, data=data, timeout=30)
+        
+        if response.status_code == 200:
+            result = response.json()
+            if result.get("ok") and result.get("uploaded") == 3:
+                results.add_pass("Upload Media ZIP", f"Successfully uploaded {result.get('uploaded')} images from ZIP")
+                return result.get("media", [])
+            else:
+                results.add_fail("Upload Media ZIP", f"Unexpected response: {result}")
+        else:
+            results.add_fail("Upload Media ZIP", f"Status code: {response.status_code}, Response: {response.text}")
+    except Exception as e:
+        results.add_fail("Upload Media ZIP", str(e))
+    return []
+
 def test_list_careers():
     """Test listing all careers"""
     try:
@@ -508,6 +553,14 @@ def run_all_tests():
     created_media = test_create_media()
     if created_media:
         test_delete_media(created_media["id"])
+    
+    # Test ZIP upload
+    print(f"\n{Colors.BOLD}Testing ZIP Upload Feature...{Colors.RESET}")
+    uploaded_media = test_upload_media_zip()
+    # Clean up uploaded test media
+    for media in uploaded_media:
+        if media.get("id"):
+            test_delete_media(media["id"])
     
     # Career tests
     print(f"\n{Colors.BOLD}Testing Career Endpoints...{Colors.RESET}")
