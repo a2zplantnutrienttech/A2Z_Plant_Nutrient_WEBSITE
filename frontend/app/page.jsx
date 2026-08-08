@@ -236,31 +236,37 @@ export default function HomePage() {
             ))}
           </Stagger>
 
-          {/* PROCESS SECTION REPLACES THE 3 REMOVED CARDS */}
-          <div className="border-t border-stone-200 pt-16 mt-10">
-            <FadeIn className="text-center max-w-2xl mx-auto mb-12">
-              <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-[0.2em] mb-4">Our Process</span>
-              <h2 className="font-serif text-3xl md:text-4xl text-emerald-950 font-semibold mt-3 leading-tight">From Soil to Scenery</h2>
-              <p className="mt-3 text-stone-600">A seamless, engineering-led journey from initial assessment to your long-term green space.</p>
+          {/* PREMIUM PROCESS SECTION */}
+          <div className="border-t border-stone-200 pt-20 mt-10">
+            <FadeIn className="text-center max-w-3xl mx-auto mb-16">
+              <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold uppercase tracking-[0.2em] mb-4">The EPC Blueprint</span>
+              <h2 className="font-serif text-3xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight">Mastering the Landscape</h2>
+              <p className="mt-4 text-stone-600 text-lg">A systematic methodology transforming raw terrain into thriving, sustainable ecosystems.</p>
             </FadeIn>
             
-            <Stagger className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 relative">
+            <Stagger className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
               {[
-                { step: "01", title: "Site Audit", desc: "Scientific soil & terrain analysis." },
-                { step: "02", title: "Design", desc: "Custom, compliant blueprints." },
-                { step: "03", title: "Sourcing", desc: "Premium native flora procurement." },
-                { step: "04", title: "Execution", desc: "Hardscaping & rapid planting." },
-                { step: "05", title: "Handover", desc: "Delivery with full quality sign-off." },
-                { step: "06", title: "AMC", desc: "Multi-year maintenance care." },
+                { step: "01", title: "Site Audit", desc: "Scientific soil & terrain analysis, assessing microclimates and environmental constraints.", img: "/real-paver-walkway2.jpg" },
+                { step: "02", title: "Design Strategy", desc: "Custom, compliant blueprints mapping out sustainable, long-term green infrastructure.", img: "/real-apartment-landscape.jpg" },
+                { step: "03", title: "Procurement", desc: "Sourcing premium, climate-resilient native flora direct from our audited nursery network.", img: "/real-nursery-delivery.jpg" },
+                { step: "04", title: "Execution", desc: "Precision heavy hardscaping, structural soil amendments, and rapid plantation.", img: "/real-avenue-install-day.jpg" },
+                { step: "05", title: "Handover", desc: "Seamless project delivery with rigorous quality sign-offs and digital geotagged reports.", img: "/real-private-garden.jpg" },
+                { step: "06", title: "Maintenance", desc: "Multi-year AMC providing continuous agronomic care to guarantee survival and growth.", img: "/real-iocl-odisha-maintenance.jpg" },
               ].map((p, i) => (
-                <StaggerItem key={i} className="relative z-10">
-                  <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 h-full hover:border-emerald-300 hover:bg-emerald-50/50 transition-colors relative group">
-                    <div className="text-3xl font-serif font-black text-emerald-100 group-hover:text-emerald-200 absolute top-4 right-4 transition-colors">
-                      {p.step}
+                <StaggerItem key={i} className="relative z-10 h-full">
+                  <div className="group rounded-2xl overflow-hidden bg-stone-50 border border-stone-200 hover:shadow-xl hover:border-emerald-300 transition-all duration-500 h-full flex flex-col">
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <img src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-emerald-950/20 to-transparent opacity-80" />
+                      <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-serif font-bold border border-white/30">
+                        {p.step}
+                      </div>
+                      <div className="absolute bottom-4 left-5 right-5">
+                        <h4 className="font-serif text-2xl text-white font-semibold">{p.title}</h4>
+                      </div>
                     </div>
-                    <div className="relative z-10 mt-6">
-                      <h4 className="font-semibold text-emerald-950 text-base">{p.title}</h4>
-                      <p className="text-stone-500 text-xs mt-2 leading-relaxed">{p.desc}</p>
+                    <div className="p-6 flex-1 flex flex-col">
+                      <p className="text-stone-600 text-sm leading-relaxed">{p.desc}</p>
                     </div>
                   </div>
                 </StaggerItem>
@@ -271,12 +277,12 @@ export default function HomePage() {
       </section>
 
       {/* CRAFTMYGARDEN TEASER */}
-      <section className="py-20 bg-gradient-to-br from-amber-50 via-stone-50 to-emerald-50 relative overflow-hidden" data-testid="craftmygarden-teaser">
+      <section className="py-12 bg-gradient-to-br from-amber-50 via-stone-50 to-emerald-50 relative overflow-hidden" data-testid="craftmygarden-teaser">
         {/* Subtle Floating Leaf */}
         <WatercolorLeafSingle className="absolute right-10 top-10 w-48 h-48 hidden md:block" opacity={0.12} rotate={60} />
         <div className="max-w-6xl mx-auto px-6 relative z-10">
           <FadeIn>
-            <Card className="relative overflow-hidden p-10 md:p-14 border-none shadow-lg grid md:grid-cols-2 gap-8 items-center bg-white">
+            <Card className="relative overflow-hidden p-8 md:p-10 border-none shadow-lg grid md:grid-cols-2 gap-8 items-center bg-white">
               <div>
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
                   Coming Soon
@@ -303,13 +309,13 @@ export default function HomePage() {
 
       {/* BLOG — only rendered if blogs exist */}
       {blogs.length > 0 && (
-        <section className="py-20 bg-stone-50 relative overflow-hidden">
+        <section className="py-12 bg-stone-50 relative overflow-hidden">
           {/* Subtle Botanical Texture */}
           <LeafVeinPattern opacity={0.08} />
           <WatercolorBranchLeft className="absolute -right-16 -bottom-20 w-72 h-[500px] hidden md:block" opacity={0.15} />
 
           <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <FadeIn className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 gap-4">
+            <FadeIn className="flex flex-col md:flex-row md:items-end md:justify-between mb-8 gap-4">
               <div>
                 <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-emerald-100/80 text-emerald-800 text-base font-bold uppercase tracking-[0.2em] mb-4">From Our Blog</span>
                 <TextReveal className="font-serif text-3xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight">Insights &amp; Expert Notes</TextReveal>
@@ -345,7 +351,7 @@ export default function HomePage() {
       )}
 
       {/* PROCUREMENT CTA */}
-      <section className="py-20 bg-emerald-950 text-white" id="request-profile" data-testid="procurement-cta">
+      <section className="py-12 bg-emerald-950 text-white" id="request-profile" data-testid="procurement-cta">
         <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
           <div>
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider bg-amber-400/90 text-emerald-950 px-3 py-1 rounded-full">
