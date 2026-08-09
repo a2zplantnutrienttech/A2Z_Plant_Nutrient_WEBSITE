@@ -142,7 +142,10 @@ export default function Footer() {
           <p>
             © {new Date().getFullYear()} {COMPANY.legalName}. All rights reserved.
           </p>
-          <p>Designed with care · Pan-India Operations</p>
+          <p>
+            <Link href="/sitemap.xml" className="hover:text-amber-300 mr-4 transition-colors">Sitemap</Link>
+            Designed with care · Pan-India Operations
+          </p>
         </div>
       </div>
     </footer>

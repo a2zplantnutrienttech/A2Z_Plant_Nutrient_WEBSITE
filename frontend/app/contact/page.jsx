@@ -155,7 +155,7 @@ export default function ContactPage() {
         <FadeIn className="mt-16 rounded-3xl overflow-hidden border border-stone-200 shadow-sm">
           <iframe
             title="A2Z Plant Nutrient location"
-            src="https://www.google.com/maps?q=Varanasi%2C+Uttar+Pradesh+221103&output=embed"
+            src="https://www.google.com/maps?q=Plot+No.+13A,+Shyam+Bihar+Colony,+17/A,+near+telephone+exchange,+Manduwadih,+Shivdaspur,+Varanasi,+Uttar+Pradesh+221103,+India&output=embed"
             width="100%"
             height="420"
             style={{ border: 0 }}

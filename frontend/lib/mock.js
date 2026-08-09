@@ -15,9 +15,9 @@ export const COMPANY = {
   email: "info@a2zplantnutrient.com",
   emailLegacy: "a2zplantnutrient@gmail.com",
   address:
-    "13A Shyam Bihar Colony, Lahartara Road, Varanasi, Uttar Pradesh 221103",
+    "Plot No. 13A, Shyam Bihar Colony, 17/A, near telephone exchange, Manduwadih, Shivdaspur, Varanasi, Uttar Pradesh 221103, India",
   addressMapUrl:
-    "https://www.google.com/maps/search/?api=1&query=13A+Shyam+Bihar+Colony+Lahartara+Road+Varanasi+Uttar+Pradesh+221103",
+    "https://www.google.com/maps/search/?api=1&query=Plot+No.+13A,+Shyam+Bihar+Colony,+17/A,+near+telephone+exchange,+Manduwadih,+Shivdaspur,+Varanasi,+Uttar+Pradesh+221103,+India",
   hours: "Mon – Sat · 09:00 AM – 06:00 PM",
   logo: "/logo.png",
   companyProfilePdf: "/docs/A2Z-Plant-Nutrient-Company-Profile.pdf",

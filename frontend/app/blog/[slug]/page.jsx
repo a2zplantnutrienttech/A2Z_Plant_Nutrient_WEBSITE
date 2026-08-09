@@ -1,5 +1,6 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -34,17 +35,7 @@ export default function BlogDetailPage() {
   }
 
   if (error || !blog) {
-    return (
-      <div className="max-w-3xl mx-auto px-6 py-32 text-center" data-testid="blog-detail-error">
-        <p className="font-serif text-3xl text-emerald-950">Article not found</p>
-        <p className="text-stone-600 mt-2">It may have been removed or the link is incorrect.</p>
-        <Button asChild className="mt-6 bg-emerald-700 hover:bg-emerald-800 rounded-full">
-          <Link href="/blog">
-            <ArrowLeft size={16} className="mr-1" /> Back to all articles
-          </Link>
-        </Button>
-      </div>
-    );
+    notFound();
   }
 
   return (
