@@ -26,14 +26,13 @@ const TRUSTED_LOGOS = [
   { name: "GSECL", alt: "Gujarat State Electricity Corporation Ltd.", src: "/logos/gsecl.png", x: -394, y: -125, size: 146 },
   { name: "TCIL", alt: "Telecommunications Consultants India Ltd.", src: "/logos/tcil-logo.png", x: 228, y: 89, size: 137 },
   { name: "Rajasthan Housing Board", alt: "Rajasthan Housing Board", src: "/logos/rhb-logo.png", x: 491, y: -136, size: 130 },
-  { name: "Nagar Nigam Varanasi", alt: "Nagar Nigam Varanasi", src: "/logos/nagar-nigam-varanasi.jpg", x: -75, y: -220, size: 157 },
+  { name: "Shivalik", alt: "Shivalik", src: "/logos/shivalik.png", x: -75, y: -220, size: 157 },
   { name: "Chhavni Parishad Varanasi", alt: "Cantonment Board Varanasi", src: "/logos/chavani-logo.png", x: -211, y: -79, size: 182 },
   { name: "Govt of Uttar Pradesh", alt: "Government of Uttar Pradesh", src: "/logos/up-logo.png", x: -42, y: 279, size: 173 },
   { name: "Sewa International", alt: "Sewa International", src: "/logos/sewa-international.png", x: -138, y: 101, size: 175 },
   { name: "CSIL", alt: "C. S. Intraconstruction Limited", src: "/logos/csil.png", x: 309, y: -190, size: 187 },
   { name: "Sunbeam", alt: "Sunbeam Group of Educational Institutions", src: "/logos/sunbeam.png", x: 54, y: 103, size: 175 },
   { name: "Shaparth", alt: "Shaparth", src: "/logos/shapearth.png", x: -31, y: -53, size: 135 },
-  { name: "Shivalik", alt: "Shivalik", src: "/logos/shivalik.png", x: -513, y: 20, size: 169 },
   { name: "Castillo", alt: "Castillo", src: "/logos/castillo.png", x: 112, y: -260, size: 170 },
 ];
 
