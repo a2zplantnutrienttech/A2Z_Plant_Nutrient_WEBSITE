@@ -117,3 +117,12 @@ Build a marketing + CMS website for A2Z Plant Nutrient Private Limited, an ISO 9
 - Replaced the About page bottom 4-card stats block with an **interactive India map** (components/IndiaMap.jsx using @svg-maps/india) highlighting the 6 operating states (UP, MP, Odisha, Delhi, Gujarat, Rajasthan) with hover tooltips, synced state chips, and 3 stat cards alongside (100+ Projects, 10 Lakh+ Sq.Ft, 2021 Incorporated).
 - New data in lib/mock.js: HIGHLIGHTS[], OPERATING_STATES[]. New dep: @svg-maps/india.
 - Verified: testing agent iteration_5 -> frontend 100%, no bugs.
+
+
+---
+## Update (June 2026) — Blog dates
+- Randomized all 19 existing blog `created_at` dates (were all 8-9 Aug 2026) across Jan 2025 - May 2026 via backend/randomize_dates.py (one-off).
+- Added backend endpoint `PATCH /api/blogs/{id}/date` (BlogDatePayload) to update a blog date; api.js `updateBlogDate()`.
+- Admin dashboard: each blog now shows its date with an "Edit date" control (date picker + Save), data-testids edit-date-{id}, date-input-{id}, save-date-{id}.
+- Fixed local backend: installed missing supabase transitive deps (postgrest/realtime/storage3/etc.).
+- Verified: blog page shows varied dates; admin login + date edit UI + PATCH endpoint all working.

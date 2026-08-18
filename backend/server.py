@@ -95,6 +95,11 @@ class Blog(BlogBase):
     updated_at: str = Field(default_factory=now_iso)
 
 
+class BlogDatePayload(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    created_at: str  # ISO 8601 datetime string
+
+
 class MediaBase(BaseModel):
     model_config = ConfigDict(extra="ignore")
     title: str
@@ -240,6 +245,16 @@ async def update_blog(blog_id: str, payload: BlogCreate):
     if payload.slug and payload.slug != existing.get("slug"):
         update_data["slug"] = payload.slug
     
+    res = db.table("blogs").update(update_data).eq("id", blog_id).execute()
+    return res.data[0]
+
+
+@api_router.patch("/blogs/{blog_id}/date", response_model=Blog)
+async def update_blog_date(blog_id: str, payload: BlogDatePayload):
+    res = db.table("blogs").select("id").eq("id", blog_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    update_data = {"created_at": payload.created_at, "updated_at": now_iso()}
     res = db.table("blogs").update(update_data).eq("id", blog_id).execute()
     return res.data[0]
 

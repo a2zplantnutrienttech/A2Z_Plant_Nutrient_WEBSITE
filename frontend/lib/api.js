@@ -45,6 +45,15 @@ export async function updateBlog(id, payload) {
   return handle(res);
 }
 
+export async function updateBlogDate(id, created_at) {
+  const res = await fetch(`${API_BASE}/blogs/${id}/date`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ created_at }),
+  });
+  return handle(res);
+}
+
 export async function deleteBlog(id) {
   const res = await fetch(`${API_BASE}/blogs/${id}`, { method: "DELETE" });
   return handle(res);

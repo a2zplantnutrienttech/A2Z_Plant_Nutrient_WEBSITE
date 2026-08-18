@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Trash2, Edit3, Plus, FileText, Image as ImageIcon, Loader2, Briefcase, Save } from "lucide-react";
+import { Trash2, Edit3, Plus, FileText, Image as ImageIcon, Loader2, Briefcase, Save, CalendarDays, X } from "lucide-react";
 import PageHero from "@/components/PageHero";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { fetchBlogs, deleteBlog, fetchMedia, deleteMedia, fetchCareers, deleteCareer, createCareer } from "@/lib/api";
+import { fetchBlogs, deleteBlog, updateBlogDate, fetchMedia, deleteMedia, fetchCareers, deleteCareer, createCareer } from "@/lib/api";
 
 const CAREER_TYPES = ["Full-time", "Part-time", "Contract", "Internship"];
 
@@ -29,6 +29,34 @@ export default function AdminPage() {
     desc: "",
   });
   const [submittingCareer, setSubmittingCareer] = useState(false);
+  const [editingDateId, setEditingDateId] = useState(null);
+  const [dateValue, setDateValue] = useState("");
+  const [savingDate, setSavingDate] = useState(false);
+
+  const startEditDate = (b) => {
+    const d = new Date(b.created_at);
+    setDateValue(isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 10));
+    setEditingDateId(b.id);
+  };
+
+  const saveDate = async (id) => {
+    if (!dateValue) {
+      toast({ title: "Pick a date first", variant: "destructive" });
+      return;
+    }
+    setSavingDate(true);
+    try {
+      const created_at = new Date(`${dateValue}T12:00:00Z`).toISOString();
+      await updateBlogDate(id, created_at);
+      toast({ title: "Date updated" });
+      setEditingDateId(null);
+      reload();
+    } catch (e) {
+      toast({ title: "Update failed", description: e.message, variant: "destructive" });
+    } finally {
+      setSavingDate(false);
+    }
+  };
 
   const reload = async () => {
     setLoading(true);
@@ -189,9 +217,52 @@ export default function AdminPage() {
                 <div className="flex-1 min-w-0">
                   <div className="text-xs uppercase tracking-wider text-emerald-700">{b.category}</div>
                   <h3 className="font-serif text-lg font-semibold text-emerald-950 truncate">{b.title}</h3>
-                  <p className="text-stone-500 text-xs mt-1">
-                    {new Date(b.created_at).toLocaleString("en-IN")}
-                  </p>
+                  {editingDateId === b.id ? (
+                    <div className="mt-2 flex flex-wrap items-center gap-2" data-testid={`date-editor-${b.id}`}>
+                      <Input
+                        type="date"
+                        value={dateValue}
+                        onChange={(e) => setDateValue(e.target.value)}
+                        className="h-9 w-44"
+                        data-testid={`date-input-${b.id}`}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => saveDate(b.id)}
+                        disabled={savingDate}
+                        className="bg-emerald-700 hover:bg-emerald-800 rounded-full"
+                        data-testid={`save-date-${b.id}`}
+                      >
+                        <Save size={14} className="mr-1" /> {savingDate ? "Saving…" : "Save"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setEditingDateId(null)}
+                        className="rounded-full border-stone-300"
+                      >
+                        <X size={14} />
+                      </Button>
+                    </div>
+                  ) : (
+                    <p className="text-stone-500 text-xs mt-1 flex items-center gap-2 flex-wrap">
+                      <span className="flex items-center gap-1">
+                        <CalendarDays size={13} />
+                        {new Date(b.created_at).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                      <button
+                        onClick={() => startEditDate(b)}
+                        className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-medium underline underline-offset-2"
+                        data-testid={`edit-date-${b.id}`}
+                      >
+                        <Edit3 size={12} /> Edit date
+                      </button>
+                    </p>
+                  )}
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <Button asChild size="sm" variant="outline" className="rounded-full">
