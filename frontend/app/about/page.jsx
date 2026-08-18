@@ -10,8 +10,10 @@ import {
   ShieldCheck,
   Users,
   Building2,
+  MapPin,
 } from "lucide-react";
 import PageHero from "@/components/PageHero";
+import IndiaMap from "@/components/IndiaMap";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FadeIn, Stagger, StaggerItem, ScaleIn } from "@/components/Motion";
@@ -30,11 +32,13 @@ import {
   CERTIFICATIONS,
   CRAFTMYGARDEN,
   COMPANY,
+  OPERATING_STATES,
 } from "@/lib/mock";
 
 export default function AboutPage() {
   const [err, setErr] = require("react").useState(null);
-  
+  const [activeState, setActiveState] = require("react").useState(null);
+
   if (err) return <div>ERROR: {err.message}</div>;
 
   return (
@@ -236,25 +240,86 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="py-20 relative overflow-hidden bg-white">
+      {/* Pan-India Footprint — interactive map */}
+      <section className="py-20 relative overflow-hidden bg-white" data-testid="footprint-section">
         {/* Organic Wave Transition */}
         <OrganicWaveSeparator className="absolute top-0 left-0 w-full h-12" opacity={0.12} />
         <WatercolorLeafSingle className="absolute right-10 bottom-10 w-48 h-48 hidden md:block" opacity={0.12} rotate={120} />
 
-        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-6 relative z-10">
-          {STATS.map((s, i) => (
-            <FadeIn key={i} delay={i * 0.05} className="text-center p-8 rounded-3xl bg-white border border-stone-200 hover:shadow-lg transition-shadow">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-700 mb-5">
-                {i === 0 ? <Building2 size={26} /> : i === 1 ? <Users size={26} /> : i === 2 ? <Leaf size={26} /> : <ShieldCheck size={26} />}
-              </div>
-              <div className="font-serif text-3xl lg:text-4xl text-emerald-800 font-semibold">
-                {/^^\d/.test(s.number) && !s.number.includes("₹") ? <Counter to={s.number} /> : s.number}
-              </div>
-              <div className="mt-2 font-serif text-lg text-emerald-950">{s.title}</div>
-              <p className="mt-2 text-stone-600 text-sm">{s.text}</p>
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <FadeIn className="text-center max-w-2xl mx-auto mb-12">
+            <p className="uppercase tracking-[0.25em] text-emerald-700 text-xs font-semibold">Where We Work</p>
+            <h2 className="font-serif text-3xl md:text-5xl text-emerald-950 font-semibold mt-3 leading-tight">
+              Our Pan-India Footprint
+            </h2>
+            <p className="mt-3 text-stone-600">
+              Actively delivering across six states and open for projects nationwide. Hover a highlighted
+              state — on the map or in the list — to see what we&apos;ve delivered there.
+            </p>
+          </FadeIn>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Map */}
+            <FadeIn className="rounded-3xl bg-gradient-to-br from-emerald-50 via-stone-50 to-amber-50 border border-stone-200 p-5 md:p-8">
+              <IndiaMap
+                operating={OPERATING_STATES}
+                activeId={activeState}
+                onActiveChange={setActiveState}
+              />
             </FadeIn>
-          ))}
+
+            {/* State chips + stat cards */}
+            <FadeIn>
+              <p className="uppercase tracking-[0.2em] text-emerald-700 text-xs font-semibold mb-3">
+                States We Operate In
+              </p>
+              <div className="flex flex-wrap gap-2 mb-8" data-testid="state-chip-list">
+                {OPERATING_STATES.map((s) => {
+                  const active = activeState === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      data-testid={`state-chip-${s.id}`}
+                      onMouseEnter={() => setActiveState(s.id)}
+                      onMouseLeave={() => setActiveState(null)}
+                      onFocus={() => setActiveState(s.id)}
+                      onBlur={() => setActiveState(null)}
+                      className={`inline-flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-full border transition-all ${
+                        active
+                          ? "bg-emerald-700 text-white border-emerald-700 shadow-md scale-105"
+                          : "bg-white text-emerald-800 border-emerald-200 hover:border-emerald-500"
+                      }`}
+                    >
+                      <MapPin size={14} /> {s.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="grid sm:grid-cols-3 gap-4" data-testid="footprint-stats">
+                {[
+                  { stat: STATS[1], Icon: Building2 },
+                  { stat: STATS[0], Icon: Leaf },
+                  { stat: STATS[3], Icon: ShieldCheck },
+                ].map(({ stat, Icon }, i) => (
+                  <div
+                    key={i}
+                    className="text-center sm:text-left p-6 rounded-2xl bg-white border border-stone-200 hover:shadow-lg transition-shadow"
+                  >
+                    <div className="w-11 h-11 mx-auto sm:mx-0 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-700 mb-4">
+                      <Icon size={22} />
+                    </div>
+                    <div className="font-serif text-2xl lg:text-3xl text-emerald-800 font-semibold">
+                      {stat.number === "2021" ? stat.number : <Counter to={stat.number} />}
+                    </div>
+                    <div className="mt-1 font-serif text-base text-emerald-950">{stat.title}</div>
+                    <p className="mt-1.5 text-stone-600 text-[13px] leading-relaxed">{stat.text}</p>
+                  </div>
+                ))}
+              </div>
+            </FadeIn>
+          </div>
         </div>
       </section>
 

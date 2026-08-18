@@ -7,7 +7,7 @@ Build a marketing + CMS website for A2Z Plant Nutrient Private Limited, an ISO 9
 - **Frontend**: Next.js 14 App Router at `/app/frontend`, port 3000 via `yarn start` (aliased to `next dev -H 0.0.0.0 -p 3000`).
 - **Backend**: FastAPI at `/app/backend`, port 8001, `/api/*` prefix (ingress-routed).
 - **DB**: MongoDB (`test_database`). Collections: `blogs`, `media`, `careers`, `contacts`, `profile_requests`.
-- **External URL**: `https://schema-design-3.preview.emergentagent.com`
+- **External URL**: `https://india-map-stats.preview.emergentagent.com`
 - **Storage**: Media as base64 in MongoDB (per user preference).
 - **PDF asset**: `/app/frontend/public/docs/A2Z-Plant-Nutrient-Company-Profile.pdf` (13.5 MB, served as `application/pdf`).
 
@@ -109,3 +109,11 @@ Build a marketing + CMS website for A2Z Plant Nutrient Private Limited, an ISO 9
 ## Credentials
 - **Admin password (dev)**: `A2Z-Admin-2026-Secure` — configured via `ADMIN_TOKEN` env in `/app/backend/.env` and `/app/frontend/.env`. Rotate before public launch.
 - Session lifetime: 8 hours (HttpOnly, Secure, SameSite=lax cookie).
+
+
+---
+## Update (June 2026) — Highlights page + About India map
+- Added new **/highlights** page (app/highlights/page.jsx + layout.jsx): 20 rephrased key-highlight cards in a distinct editorial numbered-card layout (image + index + category pill + icon badge + hover lift), intro band and emerald CTA. Linked in main nav (lib/mock.js NAV -> "Highlights" after Services).
+- Replaced the About page bottom 4-card stats block with an **interactive India map** (components/IndiaMap.jsx using @svg-maps/india) highlighting the 6 operating states (UP, MP, Odisha, Delhi, Gujarat, Rajasthan) with hover tooltips, synced state chips, and 3 stat cards alongside (100+ Projects, 10 Lakh+ Sq.Ft, 2021 Incorporated).
+- New data in lib/mock.js: HIGHLIGHTS[], OPERATING_STATES[]. New dep: @svg-maps/india.
+- Verified: testing agent iteration_5 -> frontend 100%, no bugs.
