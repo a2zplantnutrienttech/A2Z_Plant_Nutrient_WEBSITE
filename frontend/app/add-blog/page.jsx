@@ -35,6 +35,7 @@ export default function AddBlogPage() {
     category: "General",
     tags: "",
     cover_image: "",
+    publish_date: new Date().toISOString().slice(0, 10),
   });
   const [preview, setPreview] = useState("");
 
@@ -66,13 +67,17 @@ export default function AddBlogPage() {
     }
     setSubmitting(true);
     try {
+      const { publish_date, ...rest } = form;
       const payload = {
-        ...form,
+        ...rest,
         tags: form.tags
           .split(",")
           .map((t) => t.trim())
           .filter(Boolean),
       };
+      if (publish_date) {
+        payload.created_at = new Date(`${publish_date}T12:00:00Z`).toISOString();
+      }
       const blog = await createBlog(payload);
       toast({
         title: "Blog published",
@@ -157,6 +162,20 @@ export default function AddBlogPage() {
                 placeholder="A 1-2 sentence teaser…"
                 className="mt-2"
               />
+            </div>
+
+            <div>
+              <Label className="text-stone-700">Publish Date</Label>
+              <Input
+                type="date"
+                value={form.publish_date}
+                onChange={(e) => setForm({ ...form, publish_date: e.target.value })}
+                className="mt-2 w-full sm:w-56"
+                data-testid="blog-date-input"
+              />
+              <p className="text-xs text-stone-500 mt-1.5">
+                Sets the date shown on the article. Defaults to today; pick any date you like.
+              </p>
             </div>
 
             <div>

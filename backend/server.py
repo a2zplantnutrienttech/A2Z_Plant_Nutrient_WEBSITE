@@ -86,6 +86,7 @@ class BlogBase(BaseModel):
 
 class BlogCreate(BlogBase):
     slug: Optional[str] = None
+    created_at: Optional[str] = None  # optional custom publish date (ISO 8601)
 
 
 class Blog(BlogBase):
@@ -93,11 +94,17 @@ class Blog(BlogBase):
     slug: str
     created_at: str = Field(default_factory=now_iso)
     updated_at: str = Field(default_factory=now_iso)
+    featured: bool = False
 
 
 class BlogDatePayload(BaseModel):
     model_config = ConfigDict(extra="ignore")
     created_at: str  # ISO 8601 datetime string
+
+
+class BlogFeaturePayload(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    featured: bool
 
 
 class MediaBase(BaseModel):
@@ -198,15 +205,22 @@ async def create_blog(payload: BlogCreate):
         slug = f"{slug}-{str(uuid.uuid4())[:6]}"
         
     data = payload.model_dump(exclude={"slug"})
-    
+    custom_date = data.pop("created_at", None)
+
     if data.get("cover_image") and data["cover_image"].startswith("data:"):
         # upload to cloudinary
         upload_result = cloudinary.uploader.upload(data["cover_image"], folder="a2z/blogs")
         data["cover_image"] = upload_result.get("secure_url")
-        
-    blog = Blog(**data, slug=slug)
-    res = db.table("blogs").insert(blog.model_dump()).execute()
-    return res.data[0]
+
+    date_kwargs = {}
+    if custom_date:
+        date_kwargs = {"created_at": custom_date, "updated_at": custom_date}
+
+    blog = Blog(**data, slug=slug, **date_kwargs)
+    res = db.table("blogs").insert(blog.model_dump(exclude={"featured"})).execute()
+    row = res.data[0]
+    row["featured"] = (row.get("status") == "featured")
+    return row
 
 
 @api_router.get("/blogs", response_model=List[Blog])
@@ -217,6 +231,8 @@ async def list_blogs(category: Optional[str] = None, q: Optional[str] = None, li
     if q:
         query = query.or_(f"title.ilike.%{q}%,excerpt.ilike.%{q}%,content.ilike.%{q}%")
     res = query.execute()
+    for row in res.data:
+        row["featured"] = (row.get("status") == "featured")
     return res.data
 
 
@@ -225,7 +241,9 @@ async def get_blog(slug: str):
     res = db.table("blogs").select("*").eq("slug", slug).execute()
     if not res.data:
         raise HTTPException(status_code=404, detail="Blog not found")
-    return res.data[0]
+    row = res.data[0]
+    row["featured"] = (row.get("status") == "featured")
+    return row
 
 
 @api_router.put("/blogs/{blog_id}", response_model=Blog)
@@ -249,6 +267,23 @@ async def update_blog(blog_id: str, payload: BlogCreate):
     return res.data[0]
 
 
+@api_router.patch("/blogs/{blog_id}/feature", response_model=Blog)
+async def set_blog_featured(blog_id: str, payload: BlogFeaturePayload):
+    res = db.table("blogs").select("id").eq("id", blog_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    if payload.featured:
+        # Only one featured post at a time — unset any existing featured first.
+        db.table("blogs").update({"status": "published"}).eq("status", "featured").execute()
+        db.table("blogs").update({"status": "featured", "updated_at": now_iso()}).eq("id", blog_id).execute()
+    else:
+        db.table("blogs").update({"status": "published", "updated_at": now_iso()}).eq("id", blog_id).execute()
+    res = db.table("blogs").select("*").eq("id", blog_id).execute()
+    row = res.data[0]
+    row["featured"] = (row.get("status") == "featured")
+    return row
+
+
 @api_router.patch("/blogs/{blog_id}/date", response_model=Blog)
 async def update_blog_date(blog_id: str, payload: BlogDatePayload):
     res = db.table("blogs").select("id").eq("id", blog_id).execute()
@@ -256,7 +291,9 @@ async def update_blog_date(blog_id: str, payload: BlogDatePayload):
         raise HTTPException(status_code=404, detail="Blog not found")
     update_data = {"created_at": payload.created_at, "updated_at": now_iso()}
     res = db.table("blogs").update(update_data).eq("id", blog_id).execute()
-    return res.data[0]
+    row = res.data[0]
+    row["featured"] = (row.get("status") == "featured")
+    return row
 
 
 @api_router.delete("/blogs/{blog_id}")

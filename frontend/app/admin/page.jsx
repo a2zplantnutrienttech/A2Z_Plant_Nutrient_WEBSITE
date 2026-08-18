@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Trash2, Edit3, Plus, FileText, Image as ImageIcon, Loader2, Briefcase, Save, CalendarDays, X } from "lucide-react";
+import { Trash2, Edit3, Plus, FileText, Image as ImageIcon, Loader2, Briefcase, Save, CalendarDays, X, Star } from "lucide-react";
 import PageHero from "@/components/PageHero";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { fetchBlogs, deleteBlog, updateBlogDate, fetchMedia, deleteMedia, fetchCareers, deleteCareer, createCareer } from "@/lib/api";
+import { fetchBlogs, deleteBlog, updateBlogDate, setBlogFeatured, fetchMedia, deleteMedia, fetchCareers, deleteCareer, createCareer } from "@/lib/api";
 
 const CAREER_TYPES = ["Full-time", "Part-time", "Contract", "Internship"];
 
@@ -32,6 +32,20 @@ export default function AdminPage() {
   const [editingDateId, setEditingDateId] = useState(null);
   const [dateValue, setDateValue] = useState("");
   const [savingDate, setSavingDate] = useState(false);
+  const [featuring, setFeaturing] = useState(null);
+
+  const toggleFeature = async (b) => {
+    setFeaturing(b.id);
+    try {
+      await setBlogFeatured(b.id, !b.featured);
+      toast({ title: b.featured ? "Removed from featured" : "Pinned as featured" });
+      reload();
+    } catch (e) {
+      toast({ title: "Update failed", description: e.message, variant: "destructive" });
+    } finally {
+      setFeaturing(null);
+    }
+  };
 
   const startEditDate = (b) => {
     const d = new Date(b.created_at);
@@ -215,7 +229,14 @@ export default function AdminPage() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs uppercase tracking-wider text-emerald-700">{b.category}</div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs uppercase tracking-wider text-emerald-700">{b.category}</span>
+                    {b.featured && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full" data-testid={`featured-badge-${b.id}`}>
+                        <Star size={10} className="fill-amber-500 text-amber-500" /> Featured
+                      </span>
+                    )}
+                  </div>
                   <h3 className="font-serif text-lg font-semibold text-emerald-950 truncate">{b.title}</h3>
                   {editingDateId === b.id ? (
                     <div className="mt-2 flex flex-wrap items-center gap-2" data-testid={`date-editor-${b.id}`}>
@@ -265,6 +286,18 @@ export default function AdminPage() {
                   )}
                 </div>
                 <div className="flex gap-2 shrink-0">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => toggleFeature(b)}
+                    disabled={featuring === b.id}
+                    className={`rounded-full ${b.featured ? "border-amber-400 text-amber-700 bg-amber-50 hover:bg-amber-100" : "border-stone-300 text-stone-600 hover:bg-stone-50"}`}
+                    data-testid={`feature-blog-${b.id}`}
+                    title={b.featured ? "Unpin from top of blog page" : "Pin to top of blog page"}
+                  >
+                    <Star size={14} className={b.featured ? "fill-amber-500 text-amber-500 mr-1" : "mr-1"} />
+                    {b.featured ? "Featured" : "Pin"}
+                  </Button>
                   <Button asChild size="sm" variant="outline" className="rounded-full">
                     <Link href={`/blog/${b.slug}`}>View</Link>
                   </Button>

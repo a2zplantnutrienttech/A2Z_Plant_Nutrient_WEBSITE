@@ -126,3 +126,11 @@ Build a marketing + CMS website for A2Z Plant Nutrient Private Limited, an ISO 9
 - Admin dashboard: each blog now shows its date with an "Edit date" control (date picker + Save), data-testids edit-date-{id}, date-input-{id}, save-date-{id}.
 - Fixed local backend: installed missing supabase transitive deps (postgrest/realtime/storage3/etc.).
 - Verified: blog page shows varied dates; admin login + date edit UI + PATCH endpoint all working.
+
+
+---
+## Update (June 2026) — Blog: Featured / Reading time / Custom date
+- **Featured post**: repurposed unused blogs.status column ("featured" vs "published"); PATCH /api/blogs/{id}/feature (single featured enforced). Blog model exposes computed `featured`. Blog page renders a pinned "Featured" hero at top (excluded from grid). Admin has per-blog Pin/Featured toggle + badge.
+- **Reading time**: lib/utils.js readingTimeMinutes() (~200wpm); shown on blog cards, featured hero, and blog detail header.
+- **Custom publish date**: add-blog form has a Publish Date field (defaults today); BlogCreate.created_at optional, create_blog honors it.
+- Verified via API (create w/ date, feature toggle, single-featured) and preview UI (hero, read-time chips, admin pin, add-blog date field).

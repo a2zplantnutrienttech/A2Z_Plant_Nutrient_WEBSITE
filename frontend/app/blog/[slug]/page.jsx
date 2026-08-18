@@ -4,11 +4,12 @@ import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CalendarDays, User, Tag, ArrowLeft, Share2 } from "lucide-react";
+import { CalendarDays, User, Tag, ArrowLeft, Share2, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { fetchBlog } from "@/lib/api";
+import { readingTimeMinutes } from "@/lib/utils";
 
 export default function BlogDetailPage() {
   const { slug } = useParams();
@@ -76,6 +77,9 @@ export default function BlogDetailPage() {
             </span>
             <span className="flex items-center gap-1">
               <User size={14} /> {blog.author}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock size={14} /> {readingTimeMinutes(blog.content)} min read
             </span>
           </div>
         </div>
