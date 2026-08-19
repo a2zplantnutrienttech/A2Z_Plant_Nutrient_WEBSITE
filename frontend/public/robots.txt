@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://a2zplantnutrient.com/sitemap.xml

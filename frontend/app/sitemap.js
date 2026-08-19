@@ -12,7 +12,9 @@ export default async function sitemap() {
     "/careers",
     "/faq",
     "/contact",
-    "/company-profile"
+    "/company-profile",
+    "/blog",
+    "/highlights"
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
@@ -22,7 +24,7 @@ export default async function sitemap() {
 
   try {
     const blogs = await fetchBlogs().catch(() => []);
-    const blogRoutes = blogs.map((blog) => ({
+    const blogRoutes = (Array.isArray(blogs) ? blogs : []).map((blog) => ({
       url: `${baseUrl}/blog/${blog.slug}`,
       lastModified: new Date(blog.updated_at || blog.created_at),
       changeFrequency: 'weekly',

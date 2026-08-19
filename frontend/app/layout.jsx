@@ -6,6 +6,13 @@ import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   metadataBase: new URL('https://www.a2zplantnutrient.com'),
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   title: {
     template: "%s | A2Z Plant Nutrient",
     default: "A2Z Plant Nutrient | EPC Commercial Horticulture & Landscaping Partners",

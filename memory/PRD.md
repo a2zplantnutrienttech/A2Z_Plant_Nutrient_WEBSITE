@@ -7,7 +7,7 @@ Build a marketing + CMS website for A2Z Plant Nutrient Private Limited, an ISO 9
 - **Frontend**: Next.js 14 App Router at `/app/frontend`, port 3000 via `yarn start` (aliased to `next dev -H 0.0.0.0 -p 3000`).
 - **Backend**: FastAPI at `/app/backend`, port 8001, `/api/*` prefix (ingress-routed).
 - **DB**: MongoDB (`test_database`). Collections: `blogs`, `media`, `careers`, `contacts`, `profile_requests`.
-- **External URL**: `https://india-map-stats.preview.emergentagent.com`
+- **External URL**: `https://seo-cleanup-3.preview.emergentagent.com`
 - **Storage**: Media as base64 in MongoDB (per user preference).
 - **PDF asset**: `/app/frontend/public/docs/A2Z-Plant-Nutrient-Company-Profile.pdf` (13.5 MB, served as `application/pdf`).
 
