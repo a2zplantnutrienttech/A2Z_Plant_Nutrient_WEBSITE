@@ -43,6 +43,11 @@ export const NAV = [
   { label: "Contact", path: "/contact" },
 ];
 
+export const FOOTER_NAV = [
+  ...NAV,
+  { label: "FAQ", path: "/faq" },
+];
+
 export const HERO = {
   kicker: "Government · PSU · Corporate Horticulture EPC",
   title:

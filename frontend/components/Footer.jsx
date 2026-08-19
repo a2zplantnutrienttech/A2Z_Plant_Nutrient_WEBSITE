@@ -11,7 +11,7 @@ import {
   Facebook,
   Instagram
 } from "lucide-react";
-import { COMPANY, NAV, SERVICES } from "@/lib/mock";
+import { COMPANY, FOOTER_NAV, SERVICES } from "@/lib/mock";
 
 export default function Footer() {
   return (
@@ -51,7 +51,7 @@ export default function Footer() {
           <div>
             <h4 className="font-serif text-lg mb-5 text-white">Quick Links</h4>
             <ul className="space-y-3 text-sm">
-              {NAV.map((n) => (
+              {FOOTER_NAV.map((n) => (
                 <li key={n.path}>
                   <Link
                     href={n.path}
